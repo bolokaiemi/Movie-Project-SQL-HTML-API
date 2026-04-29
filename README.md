@@ -1,14 +1,14 @@
-🎬 Movie Database App
+# Movie Database App
 
 A multi-user movie collection application built with Python, SQLite, and a dynamic website generator.
 
-📌 Overview
+## Overview
 
 This project allows users to create and manage their own personal movie collections. Each user has a separate profile, ensuring that movie lists are private and customized.
 
 The application fetches movie data from an external API and generates a visually appealing website displaying the collection.
 
-🚀 Features
+### Features
 👤 User Profiles
 Create and switch between multiple users
 Each user has their own movie collection
@@ -31,13 +31,14 @@ Click “Watch Trailer” → opens trailer
 Smooth hover animations
 Ready for future features (search/filter)
 
-🧠 Tech Stack
+#### Tech Stack
 🐍 Python (core logic)
 🗄 SQLite (database)
 🌐 OMDb API (movie data)
 🧱 HTML & CSS (frontend)
 ⚡ JavaScript (UI enhancements)
-📂 Project Structure
+
+##### Project Structure
 
 project/
 │
@@ -55,7 +56,7 @@ Data is stored in SQLite database
 Website is generated using stored data
 User views their collection in the browser
 
-▶️ Usage
+###### Usage
 
 Run the application:
 
@@ -93,7 +94,7 @@ Open Sara.html
 ❤️ Favorites system
 📱 Mobile optimization
 ☁️ Deployment (web app)
-🛠 Requirements
+###### Requirements
 Python 3.x
 matplotlib (optional for charts)
 
