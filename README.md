@@ -68,6 +68,7 @@ Delete movie
 Update movie (add note)
 Generate website
 Switch user
+
 🌐 Website Output
 
 Each user gets their own HTML file:
@@ -94,7 +95,8 @@ Open Sara.html
 ❤️ Favorites system
 📱 Mobile optimization
 ☁️ Deployment (web app)
-###### Requirements
+
+####### Requirements
 Python 3.x
 matplotlib (optional for charts)
 
