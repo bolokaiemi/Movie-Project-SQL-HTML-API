@@ -1,7 +1,5 @@
 import random
 import statistics
-from typing import Dict, Any
-
 import movie_storage_sql as storage
 import movie_api as api
 import website_generator as webgen
@@ -51,9 +49,9 @@ def get_user_by_id(user_id: int):
         tuple: (id, username)
     """
     users = storage.list_users()
-    for u in users:
-        if u[0] == user_id:
-            return u
+    for user in users:
+        if user[0] == user_id:
+            return user
     return None
 
 
@@ -107,20 +105,20 @@ def command_list_movies(user_id: int) -> None:
         return
 
     print(f"\n{len(movies)} movies in total")
-    for title, data in movies.items():
-        print(f"{title} ({data['year']}): {data['rating']}")
+    for movie_title, data in movies.items():
+        print(f"{movie_title} ({data['year']}): {data['rating']}")
 
 
 def command_add_movie(user_id: int) -> None:
     """Add a movie using API + optional overrides."""
-    title = input("Enter movie name: ").strip()
+    movie_title = input("Enter movie name: ").strip()
 
-    if not title:
+    if not movie_title:
         print("Invalid title.")
         return
 
     movies = storage.list_movies(user_id)
-    if title in movies:
+    if movie_title in movies:
         print("Movie already exists!")
         return
 
@@ -159,16 +157,16 @@ def command_add_movie(user_id: int) -> None:
 
 def command_delete_movie(user_id: int) -> None:
     """Delete a movie."""
-    title = input("Enter movie to delete: ")
-    storage.delete_movie(user_id, title)
+    movie_title = input("Enter movie to delete: ")
+    storage.delete_movie(user_id, movie_title)
 
 
 def command_update_movie(user_id: int) -> None:
     """Update movie note."""
-    title = input("Movie name: ")
+    movie_title = input("Movie name: ")
     note = input("Enter note: ")
 
-    storage.update_movie_note(user_id, title, note)
+    storage.update_movie_note(user_id, movie_title, note)
     print("✅ Updated!")
 
 
@@ -193,8 +191,8 @@ def command_random_movie(user_id: int) -> None:
         print("No movies.")
         return
 
-    title = random.choice(list(movies.keys()))
-    print(title, movies[title])
+    movie_title = random.choice(list(movies.keys()))
+    print(movie_title, movies[title])
 
 
 def command_search_movie(user_id: int) -> None:
@@ -204,9 +202,9 @@ def command_search_movie(user_id: int) -> None:
 
     found = False
 
-    for title, data in movies.items():
+    for movie_title, data in movies.items():
         if text in title.lower():
-            print(f"{title} ({data['year']}): {data['rating']}")
+            print(f"{movie_title} ({data['year']}): {data['rating']}")
             found = True
 
     if not found:
@@ -223,8 +221,8 @@ def command_sort_by_rating(user_id: int) -> None:
         reverse=True
     )
 
-    for title, data in sorted_movies:
-        print(f"{title} ({data['year']}): {data['rating']}")
+    for movie_title, data in sorted_movies:
+        print(f"{movie_title} ({data['year']}): {data['rating']}")
 
 
 def command_sort_by_year(user_id: int) -> None:
@@ -237,8 +235,8 @@ def command_sort_by_year(user_id: int) -> None:
         reverse=True
     )
 
-    for title, data in sorted_movies:
-        print(f"{title} ({data['year']}): {data['rating']}")
+    for movie_title, data in sorted_movies:
+        print(f"{movie_title} ({data['year']}): {data['rating']}")
 
 
 def command_generate_website(user_id: int) -> None:

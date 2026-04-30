@@ -6,7 +6,7 @@ import movie_api as api
 import website_generator as webgen
 
 
-
+user_id = 1
 title = "My Movies Database"
 width = 42
 
@@ -30,7 +30,7 @@ def print_menu():
     print("7. Search movie")
     print("8. Movies sorted by rating")
     print("9. Generate website")
-    print("10. Run API server")
+
 
 
 def pause():
@@ -44,12 +44,12 @@ def pause():
 
 def command_list_movies():
     """Retrieve all movies from storage and display them."""
-    movies = storage.list_movies()
+    movies = storage.list_movies(user_id)
 
     print(f"\n{len(movies)} movies in total")
 
-    for title, data in movies.items():
-        print(f"{title} ({data['year']}): {data['rating']}")
+    for movie_title, data in movies.items():
+        print(f"{movie_title} ({data['year']}): {data['rating']}")
 
 
 def command_add_movie():
@@ -59,14 +59,14 @@ def command_add_movie():
     Prompts the user for a movie title, fetches its data,
     validates the response, and stores it in the database.
     """
-    title = input("Enter movie name: ").strip()
+    movie_title = input("Enter movie name: ").strip()
 
-    if not title:
+    if not movie_title:
         print("Invalid title.")
         return
 
-    movies = storage.list_movies()
-    if title in movies:
+    movies = storage.list_movies(user_id)
+    if movie_title in movies:
         print("Movie already exists!")
         return
 
@@ -99,8 +99,8 @@ def command_add_movie():
 
 def command_delete_movie():
     """Delete a movie from storage based on user input."""
-    title = input("Enter movie to delete: ")
-    storage.delete_movie(title)
+    movie_title = input("Enter movie to delete: ")
+    storage.delete_movie(movie_title)
 
 
 def command_update_movie():
@@ -109,7 +109,7 @@ def command_update_movie():
 
     Prompts the user for a movie title and a new rating value.
     """
-    title = input("Movie name: ")
+    movie_title = input("Movie name: ")
 
     try:
         rating = float(input("New rating: "))
@@ -117,7 +117,7 @@ def command_update_movie():
         print("Invalid rating.")
         return
 
-    storage.update_movie(title, rating)
+    storage.update_movie(movie_title, rating)
 
 
 def command_statistics():
@@ -146,8 +146,8 @@ def command_random_movie():
         print("No movies available.")
         return
 
-    title = random.choice(list(movies.keys()))
-    print(title, movies[title])
+    movie_title = random.choice(list(movies.keys()))
+    print(movie_title, movies[title])
 
 
 def command_search_movie():
@@ -161,9 +161,9 @@ def command_search_movie():
 
     found = False
 
-    for title, data in movies.items():
-        if text in title.lower():
-            print(f"{title} ({data['year']}): {data['rating']}")
+    for movie_title, data in movies.items():
+        if text in movie_title.lower():
+            print(f"{movie_title} ({data['year']}): {data['rating']}")
             found = True
 
     if not found:
@@ -180,8 +180,8 @@ def command_sort_by_rating():
         reverse=True
     )
 
-    for title, data in sorted_movies:
-        print(f"{title} ({data['year']}): {data['rating']}")
+    for movie_title, data in sorted_movies:
+        print(f"{movie_title} ({data['year']}): {data['rating']}")
 
 
 def command_generate_website():
@@ -190,7 +190,7 @@ def command_generate_website():
 
     Uses the website_generator module.
     """
-    movies = storage.list_movies()
+    movies = storage.list_movies(user_id)
     webgen.generate(movies)
     print("🌐 Website generated successfully.")
 
