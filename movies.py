@@ -1,9 +1,15 @@
 import random
 import statistics
+from typing import Dict, Any
 
 import movie_storage_sql as storage
 import movie_api as api
 import website_generator as webgen
+
+
+# =========================
+# UI HEADER
+# =========================
 
 title = "My Movies Database"
 width = 42
@@ -11,10 +17,57 @@ width = 42
 print("*" * width)
 print(title.center(width))
 print("*" * width)
+
+
+# =========================
+# HELPER FUNCTIONS (LOGIC)
+# =========================
+
+def safe_int_input(prompt: str) -> int:
+    """
+    Safely get an integer input from the user.
+
+    Args:
+        prompt (str): Input prompt message.
+
+    Returns:
+        int: A valid integer entered by the user.
+    """
+    while True:
+        value = input(prompt)
+        if value.isdigit():
+            return int(value)
+        print("❌ Please enter a valid number.")
+
+
+def get_user_by_id(user_id: int):
+    """
+    Retrieve a user tuple by ID.
+
+    Args:
+        user_id (int): The ID of the user.
+
+    Returns:
+        tuple: (id, username)
+    """
+    users = storage.list_users()
+    for u in users:
+        if u[0] == user_id:
+            return u
+    return None
+
+
 # =========================
 # USER SELECTION
 # =========================
-def select_user():
+
+def select_user() -> int:
+    """
+    Allow user to select or create a user.
+
+    Returns:
+        int: Selected user ID.
+    """
     users = storage.list_users()
 
     print("\nSelect a user:")
@@ -22,21 +75,31 @@ def select_user():
         print(f"{u[0]}. {u[1]}")
     print("0. Create new user")
 
-    choice = input("Enter choice: ")
+    choice = safe_int_input("Enter choice: ")
 
-    if choice == "0":
-        name = input("Enter new username: ")
+    if choice == 0:
+        name = input("Enter new username: ").strip()
+        if not name:
+            print("❌ Invalid name.")
+            return select_user()
+
         storage.add_user(name)
         return select_user()
 
-    return int(choice)
+    user = get_user_by_id(choice)
+    if not user:
+        print("❌ User not found.")
+        return select_user()
+
+    return choice
 
 
 # =========================
 # COMMANDS
 # =========================
 
-def command_list_movies(user_id):
+def command_list_movies(user_id: int) -> None:
+    """Display all movies for a user."""
     movies = storage.list_movies(user_id)
 
     if not movies:
@@ -48,7 +111,8 @@ def command_list_movies(user_id):
         print(f"{title} ({data['year']}): {data['rating']}")
 
 
-def command_add_movie(user_id):
+def command_add_movie(user_id: int) -> None:
+    """Add a movie using API + optional overrides."""
     title = input("Enter movie name: ").strip()
 
     if not title:
@@ -72,32 +136,12 @@ def command_add_movie(user_id):
         year = int(data["year"])
         rating = float(data["rating"])
     except (KeyError, ValueError):
-        print("⚠️ Invalid data from API.")
+        print("⚠️ Invalid API data.")
         return
 
-    print("\nMovie found:")
-    print(f"Title: {movie_title}")
-    print(f"Year: {year}")
-    print(f"Rating: {rating}")
-
-    # Poster + Trailer (user override)
-    poster_url = input("Enter poster URL (press Enter to use API/default): ").strip()
-    if not poster_url:
-        poster_url = data.get("poster", "")
-
-    trailer_url = input("Enter trailer URL (press Enter to use API/default): ").strip()
-    if not trailer_url:
-        trailer_url = data.get("trailer", "")
-
+    poster_url = input("Poster URL (Enter = default): ").strip() or data.get("poster", "")
+    trailer_url = input("Trailer URL (Enter = default): ").strip() or data.get("trailer", "")
     country = data.get("country", "Unknown")
-
-    print("\nFinal Preview:")
-    print(f"Title: {movie_title}")
-    print(f"Year: {year}")
-    print(f"Rating: {rating}")
-    print(f"Poster: {poster_url}")
-    print(f"Trailer: {trailer_url}")
-    print(f"Country: {country}")
 
     storage.add_movie(
         user_id,
@@ -106,51 +150,55 @@ def command_add_movie(user_id):
         rating,
         poster_url,
         trailer_url,
-        "",   # note
+        "",
         country
     )
 
-    print("\n✅ Movie added successfully!")
+    print("✅ Movie added!")
 
 
-def command_delete_movie(user_id):
+def command_delete_movie(user_id: int) -> None:
+    """Delete a movie."""
     title = input("Enter movie to delete: ")
     storage.delete_movie(user_id, title)
 
 
-def command_update_movie(user_id):
+def command_update_movie(user_id: int) -> None:
+    """Update movie note."""
     title = input("Movie name: ")
-    note = input("Enter movie note: ")
+    note = input("Enter note: ")
 
     storage.update_movie_note(user_id, title, note)
-    print("Movie updated!")
+    print("✅ Updated!")
 
 
-def command_statistics(user_id):
+def command_statistics(user_id: int) -> None:
+    """Show average and median rating."""
     movies = storage.list_movies(user_id)
 
     if not movies:
-        print("No movies available.")
+        print("No movies.")
         return
 
     ratings = [m["rating"] for m in movies.values()]
-
     print("Average:", round(statistics.mean(ratings), 2))
     print("Median:", round(statistics.median(ratings), 2))
 
 
-def command_random_movie(user_id):
+def command_random_movie(user_id: int) -> None:
+    """Show random movie."""
     movies = storage.list_movies(user_id)
 
     if not movies:
-        print("No movies available.")
+        print("No movies.")
         return
 
     title = random.choice(list(movies.keys()))
     print(title, movies[title])
 
 
-def command_search_movie(user_id):
+def command_search_movie(user_id: int) -> None:
+    """Search movies by title."""
     movies = storage.list_movies(user_id)
     text = input("Search: ").lower()
 
@@ -162,10 +210,11 @@ def command_search_movie(user_id):
             found = True
 
     if not found:
-        print("No matches found.")
+        print("No matches.")
 
 
-def command_sort_by_rating(user_id):
+def command_sort_by_rating(user_id: int) -> None:
+    """Sort movies by rating."""
     movies = storage.list_movies(user_id)
 
     sorted_movies = sorted(
@@ -178,7 +227,8 @@ def command_sort_by_rating(user_id):
         print(f"{title} ({data['year']}): {data['rating']}")
 
 
-def command_sort_by_year(user_id):
+def command_sort_by_year(user_id: int) -> None:
+    """Sort movies by year."""
     movies = storage.list_movies(user_id)
 
     sorted_movies = sorted(
@@ -191,65 +241,75 @@ def command_sort_by_year(user_id):
         print(f"{title} ({data['year']}): {data['rating']}")
 
 
-def command_generate_website(user_id):
+def command_generate_website(user_id: int) -> None:
+    """Generate user website."""
     movies = storage.list_movies(user_id)
+    user = get_user_by_id(user_id)
 
-    user = [u for u in storage.list_users() if u[0] == user_id][0]
+    if not user:
+        print("User not found.")
+        return
+
     username = user[1]
-
     webgen.generate(movies, username)
-    print("🌐 Website generated successfully.")
+
+    print("🌐 Website generated!")
 
 
 # =========================
-# MAIN
+# MAIN LOOP (CLI ONLY)
 # =========================
 
-def main():
+def print_menu() -> None:
+    """Display menu."""
+    print("\nMenu:")
+    print("1. List movies")
+    print("2. Add movie")
+    print("3. Delete movie")
+    print("4. Update movie")
+    print("5. Generate website")
+    print("6. Stats")
+    print("7. Random movie")
+    print("8. Search movie")
+    print("9. Sort by rating")
+    print("10. Sort by year")
+    print("11. Switch user")
+    print("0. Exit")
+
+
+def main() -> None:
+    """Run the CLI application."""
     storage.create_table()
 
     user_id = select_user()
 
     while True:
-        print("\nMenu:")
-        print("1. List movies")
-        print("2. Add movie")
-        print("3. Delete movie")
-        print("4. Update movie (add note)")
-        print("5. Generate website")
-        print("6. Stats")
-        print("7. Random movie")
-        print("8. Search movie")
-        print("9. Sort by rating")
-        print("10. Sort by year")
-        print("11. Switch user")
-        print("0. Exit")
+        print_menu()
+        choice = safe_int_input("Choice: ")
 
-        choice = input("Choice: ")
-
-        if choice == "1":
+        if choice == 1:
             command_list_movies(user_id)
-        elif choice == "2":
+        elif choice == 2:
             command_add_movie(user_id)
-        elif choice == "3":
+        elif choice == 3:
             command_delete_movie(user_id)
-        elif choice == "4":
+        elif choice == 4:
             command_update_movie(user_id)
-        elif choice == "5":
+        elif choice == 5:
             command_generate_website(user_id)
-        elif choice == "6":
+        elif choice == 6:
             command_statistics(user_id)
-        elif choice == "7":
+        elif choice == 7:
             command_random_movie(user_id)
-        elif choice == "8":
+        elif choice == 8:
             command_search_movie(user_id)
-        elif choice == "9":
+        elif choice == 9:
             command_sort_by_rating(user_id)
-        elif choice == "10":
+        elif choice == 10:
             command_sort_by_year(user_id)
-        elif choice == "11":
+        elif choice == 11:
             user_id = select_user()
-        elif choice == "0":
+        elif choice == 0:
             print("Goodbye!")
             break
         else:

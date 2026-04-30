@@ -1,12 +1,18 @@
 import random
 import statistics
-import matplotlib.pyplot as plt
 
 import movie_storage_sql as storage
 import movie_api as api
 import website_generator as webgen
 
 
+
+title = "My Movies Database"
+width = 42
+
+print("*" * width)
+print(title.center(width))
+print("*" * width)
 # =========================
 # MENU
 # =========================
@@ -24,13 +30,11 @@ def print_menu():
     print("7. Search movie")
     print("8. Movies sorted by rating")
     print("9. Generate website")
-    print("10. Rating histogram")
-    print("11. Sort by year")
-    print("12. Filter movies")
-    print("13. Rating bar chart")
+    print("10. Run API server")
 
 
 def pause():
+    """Pause execution until the user presses Enter."""
     input("\nPress enter to continue ")
 
 
@@ -39,6 +43,7 @@ def pause():
 # =========================
 
 def command_list_movies():
+    """Retrieve all movies from storage and display them."""
     movies = storage.list_movies()
 
     print(f"\n{len(movies)} movies in total")
@@ -48,6 +53,12 @@ def command_list_movies():
 
 
 def command_add_movie():
+    """
+    Add a new movie using data fetched from an external API.
+
+    Prompts the user for a movie title, fetches its data,
+    validates the response, and stores it in the database.
+    """
     title = input("Enter movie name: ").strip()
 
     if not title:
@@ -75,43 +86,29 @@ def command_add_movie():
         print("⚠️ Invalid data from API.")
         return
 
-    print("\nMovie found:")
+    # Optional preview
+    print("\nPreview:")
     print(f"Title: {movie_title}")
     print(f"Year: {year}")
     print(f"Rating: {rating}")
 
-    poster_url = input("Enter poster URL (press Enter to use API/default): ").strip()
-    if not poster_url:
-        poster_url = data.get("poster", "")
-
-    trailer_url = input("Enter trailer URL (press Enter to use API/default): ").strip()
-    if not trailer_url:
-        trailer_url = data.get("trailer", "")
-
-    print("\nFinal Preview:")
-    print(f"Title: {movie_title}")
-    print(f"Year: {year}")
-    print(f"Rating: {rating}")
-    print(f"Poster: {poster_url}")
-    print(f"Trailer: {trailer_url}")
-
-    storage.add_movie(
-        movie_title,
-        year,
-        rating,
-        poster_url,
-        trailer_url
-    )
+    storage.add_movie(movie_title, year, rating)
 
     print("\n✅ Movie added successfully!")
 
 
 def command_delete_movie():
+    """Delete a movie from storage based on user input."""
     title = input("Enter movie to delete: ")
     storage.delete_movie(title)
 
 
 def command_update_movie():
+    """
+    Update the rating of an existing movie.
+
+    Prompts the user for a movie title and a new rating value.
+    """
     title = input("Movie name: ")
 
     try:
@@ -124,6 +121,11 @@ def command_update_movie():
 
 
 def command_statistics():
+    """
+    Display statistical information about movie ratings.
+
+    Calculates and prints the average and median ratings.
+    """
     movies = storage.list_movies()
 
     if not movies:
@@ -137,6 +139,7 @@ def command_statistics():
 
 
 def command_random_movie():
+    """Select and display a random movie from storage."""
     movies = storage.list_movies()
 
     if not movies:
@@ -148,6 +151,11 @@ def command_random_movie():
 
 
 def command_search_movie():
+    """
+    Search for movies by title substring.
+
+    Performs a case-insensitive search and displays matches.
+    """
     movies = storage.list_movies()
     text = input("Search: ").lower()
 
@@ -163,6 +171,7 @@ def command_search_movie():
 
 
 def command_sort_by_rating():
+    """Display all movies sorted by rating in descending order."""
     movies = storage.list_movies()
 
     sorted_movies = sorted(
@@ -176,57 +185,16 @@ def command_sort_by_rating():
 
 
 def command_generate_website():
+    """
+    Generate a static website displaying all movies.
+
+    Uses the website_generator module.
+    """
     movies = storage.list_movies()
     webgen.generate(movies)
     print("🌐 Website generated successfully.")
 
 
-def command_histogram():
-    movies = storage.list_movies()
-    ratings = [m["rating"] for m in movies.values()]
-
-    plt.hist(ratings, bins=10)
-    plt.title("Ratings Histogram")
-    plt.show()
-
-
-def command_sort_by_year():
-    movies = storage.list_movies()
-
-    sorted_movies = sorted(
-        movies.items(),
-        key=lambda x: x[1]["year"],
-        reverse=True
-    )
-
-    for title, data in sorted_movies:
-        print(f"{title} ({data['year']}): {data['rating']}")
-
-
-def command_filter_movies():
-    movies = storage.list_movies()
-
-    try:
-        min_rating = float(input("Min rating: "))
-    except ValueError:
-        print("Invalid input.")
-        return
-
-    for title, data in movies.items():
-        if data["rating"] >= min_rating:
-            print(f"{title} ({data['year']}): {data['rating']}")
-
-
-def command_bar_chart():
-    movies = storage.list_movies()
-
-    titles = list(movies.keys())
-    ratings = [m["rating"] for m in movies.values()]
-
-    plt.bar(titles, ratings)
-    plt.xticks(rotation=45)
-    plt.title("Movie Ratings")
-    plt.show()
 
 
 # =========================
@@ -234,11 +202,17 @@ def command_bar_chart():
 # =========================
 
 def main():
+    """
+    Run the main application loop.
+
+    Initializes storage and repeatedly prompts the user
+    to select an action from the menu.
+    """
     storage.create_table()
 
     while True:
         print_menu()
-        choice = input("Choice (0-13): ").strip()
+        choice = input("Choice: ")
 
         if choice == "0":
             print("Goodbye!")
@@ -261,14 +235,6 @@ def main():
             command_sort_by_rating()
         elif choice == "9":
             command_generate_website()
-        elif choice == "10":
-            command_histogram()
-        elif choice == "11":
-            command_sort_by_year()
-        elif choice == "12":
-            command_filter_movies()
-        elif choice == "13":
-            command_bar_chart()
         else:
             print("Invalid choice.")
 
