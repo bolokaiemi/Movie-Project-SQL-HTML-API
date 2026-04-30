@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Jack's Movies</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+}
+
+.navbar {
+    padding: 20px;
+    background:#009B50;
+    text-align: center;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.movie {
+    background: #1c1c1c;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.movie:hover {
+    transform: scale(1.05);
+}
+
+.movie img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.flag {
+    width: 30px;
+    margin-top: 5px;
+}
+
+.note {
+    font-size: 12px;
+    color: #bbb;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+}
+
+.modal-content {
+    background: #222;
+    margin: 5% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 700px;
+}
+
+.close {
+    float: right;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+button {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #e50914;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+<h1>Jack's Movie Collection 🎬</h1>
+</nav>
+
+<div class="container">
+
+<div class="movie" onclick="openModal(0)">
+<img src="https://upload.wikimedia.org/wikipedia/en/0/00/Spider-Man_No_Way_Home_poster.jpg">
+<h3>Spider-Man: No Way Home</h3>
+<p>⭐ 8.1</p>
+<p>2021</p>
+
+<div class="note"></div>
+</div>
+
+<div id="modal0" class="modal">
+<div class="modal-content">
+<span class="close" onclick="closeModal(0)">&times;</span>
+
+<h2>Spider-Man: No Way Home</h2>
+<p>2021</p>
+<p>⭐ 8.1</p>
+
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/rt-2cxAiPJk?si=wpVkURTrPMZXSI3b" frameborder="0" allowfullscreen></iframe>
+</div>
+</div>
+
+<div class="movie" onclick="openModal(1)">
+<img src="https://upload.wikimedia.org/wikipedia/en/8/89/Frozen_II_%282019_animated_film%29.jpg">
+<h3>Frozen II</h3>
+<p>⭐ 6.8</p>
+<p>2019</p>
+
+<div class="note"></div>
+</div>
+
+<div id="modal1" class="modal">
+<div class="modal-content">
+<span class="close" onclick="closeModal(1)">&times;</span>
+
+<h2>Frozen II</h2>
+<p>2019</p>
+<p>⭐ 6.8</p>
+
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/Zi4LMpSDccc?si=PkQyuoj_lc0kAXZi" frameborder="0" allowfullscreen></iframe>
+</div>
+</div>
+
+<div class="movie" onclick="openModal(2)">
+<img src="https://upload.wikimedia.org/wikipedia/en/2/26/Moana_Teaser_Poster.jpg">
+<h3>Moana</h3>
+<p>⭐ 7.6</p>
+<p>2016</p>
+
+<div class="note"></div>
+</div>
+
+<div id="modal2" class="modal">
+<div class="modal-content">
+<span class="close" onclick="closeModal(2)">&times;</span>
+
+<h2>Moana</h2>
+<p>2016</p>
+<p>⭐ 7.6</p>
+
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/LKFuXETZUsI?si=WrDKk96dLuDiDtCW" frameborder="0" allowfullscreen></iframe>
+</div>
+</div>
+
+<div class="movie" onclick="openModal(3)">
+<img src="https://upload.wikimedia.org/wikipedia/en/7/76/Home_alone_poster.jpg">
+<h3>Home Alone</h3>
+<p>⭐ 7.8</p>
+<p>1990</p>
+
+<div class="note"></div>
+</div>
+
+<div id="modal3" class="modal">
+<div class="modal-content">
+<span class="close" onclick="closeModal(3)">&times;</span>
+
+<h2>Home Alone</h2>
+<p>1990</p>
+<p>⭐ 7.8</p>
+
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/jEDaVHmw7r4?si=mMAV5LTZqJHIZCXw" frameborder="0" allowfullscreen></iframe>
+</div>
+</div>
+
+<div class="movie" onclick="openModal(4)">
+<img src="https://upload.wikimedia.org/wikipedia/en/d/d2/Back_to_the_Future.jpg">
+<h3>Back to the Future</h3>
+<p>⭐ 8.5</p>
+<p>1985</p>
+
+<div class="note"></div>
+</div>
+
+<div id="modal4" class="modal">
+<div class="modal-content">
+<span class="close" onclick="closeModal(4)">&times;</span>
+
+<h2>Back to the Future</h2>
+<p>1985</p>
+<p>⭐ 8.5</p>
+
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/MdENmefJRpw?si=Zt2wRVr1GIsAp_8O" frameborder="0" allowfullscreen></iframe>
+</div>
+</div>
+
+</div>
+
+<script>
+function openModal(id){document.getElementById("modal"+id).style.display="block";}
+function closeModal(id){document.getElementById("modal"+id).style.display="none";}
+</script>
+
+</body>
+</html>

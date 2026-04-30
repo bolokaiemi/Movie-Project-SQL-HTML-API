@@ -1,195 +1,175 @@
-def generate(movies):
-    html = """
+def country_to_flag(country):
+    mapping = {
+        "USA": "us",
+        "United States": "us",
+        "UK": "gb",
+        "Germany": "de",
+        "France": "fr",
+        "India": "in",
+        "Spain": "es",
+        "Italy": "it",
+        "Japan": "jp",
+        "Canada": "ca"
+    }
+
+    code = mapping.get(country, None)
+    return f"https://flagcdn.com/w40/{code}.png" if code else ""
+
+
+def generate(movies, username="User"):
+
+    html = f"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>My Movie APP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>{username}'s Movies</title>
 
 <style>
-
-/* RESET */
-* {
+* {{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
+}}
 
-/* BODY */
-body {
-    font-family: Monaco;
-    background: #F5F5F0;
-}
+body {{
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+}}
 
-/* NAVBAR */
-.navbar {
-    padding: 50px;
+.navbar {{
+    padding: 20px;
     background:#009B50;
     text-align: center;
-    
-}
+}}
 
-.navbar h1 {
-    color: white;
-}
+.container {{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}}
 
-/* GRID */
-.container {
-    display: flex;
-    flex-direction: row;
-    grid-template-columns: repeat(auto-fill, 1fr);
-    gap: 30px;
-    justify-content: center;
-    padding:10px 15px;
-    margin-top: 20px
-    
-}
-
-/* MOVIE CARD */
-.movie {
-    cursor: pointer;
+.movie {{
+    background: #1c1c1c;
+    padding: 10px;
+    border-radius: 10px;
     text-align: center;
+    cursor: pointer;
     transition: 0.3s;
-}
+}}
 
-.movie:hover {
+.movie:hover {{
     transform: scale(1.05);
-}
+}}
 
-/* POSTER */
-.movie img {
-    width: 140px;
-    height: 193px;
+.movie img {{
+    width: 100%;
+    height: 240px;
     object-fit: cover;
-    display: block;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-}
+    border-radius: 8px;
+}}
 
-/* TEXT */
-.movie h2 {
-    font-size: 0.85em;
-    margin-top: 8px;
-}
+.flag {{
+    width: 30px;
+    margin-top: 5px;
+}}
 
-.movie p {
-    font-size: 0.75em;
-    color: #666;
-}
+.note {{
+    font-size: 12px;
+    color: #bbb;
+}}
 
-/* MODAL BACKGROUND */
-.modal {
+.modal {{
     display: none;
     position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
     width: 100%;
     height: 100%;
+    background: rgba(0,0,0,0.8);
+}}
 
-    background-color: rgba(0,0,0,0.7);
-}
-
-/* MODAL CONTENT */
-.modal-content {
-    background: white;
+.modal-content {{
+    background: #222;
     margin: 5% auto;
     padding: 20px;
-    width: 60%;
+    width: 80%;
     max-width: 700px;
-    text-align: center;
-}
+}}
 
-/* CLOSE BUTTON */
-.close {
+.close {{
     float: right;
     font-size: 28px;
     cursor: pointer;
-}
+}}
 
-/* BUTTON */
-button {
+button {{
     margin-top: 10px;
     padding: 8px 16px;
-    background: #009B50;
+    background: #e50914;
     color: white;
     border: none;
+    border-radius: 6px;
     cursor: pointer;
-}
-
-button:hover {
-    background: #007a3d;
-}
-
+}}
 </style>
 </head>
 
 <body>
 
 <nav class="navbar">
-  <h1>My Movie APP</h1>
+<h1>{username}'s Movie Collection 🎬</h1>
 </nav>
 
 <div class="container">
 """
 
-    for i, (title, data) in enumerate(movies.items()):
-        poster = data.get("poster_url", "")
-        trailer = data.get("trailer_url", "")
+    for i, (title, movie) in enumerate(movies.items()):
+
+        poster = movie.get("poster") or movie.get("poster_url") or "https://via.placeholder.com/300x450"
+        trailer = movie.get("trailer") or movie.get("trailer_url") or ""
+
+        if "watch?v=" in trailer:
+            trailer = trailer.replace("watch?v=", "embed/")
+
+        flag = country_to_flag(movie.get("country"))
 
         html += f"""
-        <div class="movie" onclick="openModal({i})">
-            <img src="{poster}" alt="{title}">
-            <h2>{title}</h2>
-            <p>{data['year']}</p>
-            <p>⭐ {data['rating']}</p>
-        </div>
+<div class="movie" onclick="openModal({i})">
+<img src="{poster}">
+<h3>{title}</h3>
+<p>⭐ {movie.get('rating')}</p>
+<p>{movie.get('year')}</p>
+{"<img class='flag' src='" + flag + "'>" if flag else ""}
+<div class="note">{movie.get('note','')}</div>
+</div>
 
-        <div id="modal{i}" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeModal({i})">&times;</span>
-                <h2>{title}</h2>
-                <p>Year: {data['year']}</p>
-                <p>Rating: ⭐ {data['rating']}</p>
+<div id="modal{i}" class="modal">
+<div class="modal-content">
+<span class="close" onclick="closeModal({i})">&times;</span>
 
-                <iframe width="100%" height="400"
-                    src="{trailer}"
-                    frameborder="0"
-                    allowfullscreen>
-                </iframe>
+<h2>{title}</h2>
+<p>{movie.get('year')}</p>
+<p>⭐ {movie.get('rating')}</p>
 
-                <br>
-                <a href="{trailer}" target="_blank">
-                    <button>▶ Play Trailer</button>
-                </a>
-            </div>
-        </div>
-        """
+<iframe width="100%" height="400" src="{trailer}" frameborder="0" allowfullscreen></iframe>
+</div>
+</div>
+"""
 
     html += """
 </div>
 
 <script>
-function openModal(id) {
-    document.getElementById("modal" + id).style.display = "block";
-}
-
-function closeModal(id) {
-    document.getElementById("modal" + id).style.display = "none";
-}
-
-window.onclick = function(event) {
-    let modals = document.getElementsByClassName("modal");
-    for (let i = 0; i < modals.length; i++) {
-        if (event.target === modals[i]) {
-            modals[i].style.display = "none";
-        }
-    }
-}
+function openModal(id){document.getElementById("modal"+id).style.display="block";}
+function closeModal(id){document.getElementById("modal"+id).style.display="none";}
 </script>
 
 </body>
 </html>
 """
 
-    with open("movies.html", "w", encoding="utf-8") as f:
+    with open(f"{username}.html", "w", encoding="utf-8") as f:
         f.write(html)
