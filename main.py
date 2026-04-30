@@ -6,12 +6,7 @@ import movie_storage_sql as storage
 import movie_api as api
 import website_generator as webgen
 
-title = "My Movies Database"
-width = 42
 
-print("*" * width)
-print(title.center(width))
-print("*" * width)
 # =========================
 # MENU
 # =========================
